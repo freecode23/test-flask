@@ -1,6 +1,5 @@
 import React from 'react';
 import WebcamCapture from './components/webcamcapture.js';
-import Messages from './components/messages';
 import './App.css';
 
 

@@ -17,7 +17,6 @@ CORS(app)
 socketIo = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 @socketIo.on("frame")  
 def handleMessage(data):
-    
     result_str = data
     if(not result_str):
         print("no result")
