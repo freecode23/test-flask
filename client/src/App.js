@@ -14,7 +14,7 @@ const App = () => {
           <h2>Live Face Recognition run on the Web</h2>
         </div>
         <WebcamCapture />
-        <Messages />
+        {/* <Messages /> */}
       </div>
 
     </>
