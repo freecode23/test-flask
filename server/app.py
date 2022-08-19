@@ -13,9 +13,9 @@ from flask_socketio import SocketIO, send, emit
 app = Flask(__name__)
 CORS(app)
 
-# socket - get message
-socketIo = SocketIO(app, cors_allowed_origins="*")
-@socketIo.on("message")  
+# socket - get frame
+socketIo = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
+@socketIo.on("frame")  
 def handleMessage(data):
     
     result_str = data
@@ -36,15 +36,13 @@ def handleMessage(data):
         thickness = 2
         frame = cv2.putText(frame, 'OpenCV', coord, font,
 							fontScale, color, thickness, cv2.LINE_AA)
-        # 4. convert opencv frame to base64 string
+        # 4. convert opencv frame to json string
         retval, buffer = cv2.imencode('.jpg', frame)
-        base64String = base64.b64encode(buffer)
-        
-        # print("type>>>",type(base64String))
-        json_data = {'data': base64String}
-        emit('message', json_data, broadcast=True)
-        # send({data: base64String}, broadcast=True, json=True)
-        # send(data, broadcast=True)
+        base64Bytes = base64.b64encode(buffer)
+        json_string = json.dumps({'image': base64Bytes.decode("utf-8")})
+    
+        emit("frame", json_string, broadcast=True)
+
         
 # http
 @app.route('/api', methods=['POST', 'GET'])

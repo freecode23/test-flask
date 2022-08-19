@@ -50,7 +50,7 @@ const WebcamCapture = () => {
                 const imageSrc = webcamRef.current.getScreenshot();
                 
                 // - send image through websocket
-                socket.emit("message", imageSrc);
+                socket.emit("frame", imageSrc);
             } catch (err) {
                 console.log(err);
             }
@@ -60,15 +60,12 @@ const WebcamCapture = () => {
 
     const getFrames = () => {
         try {
-            console.log("getting message...");
-            socket.on("message", data => {
-                // setDataName(data);
-                
-                const output = 'data:image/jpeg;base64,' + data["data"]
-                console.log("returned base64string", output)
+            socket.on("frame", data => {
+                // console.log("content>>", JSON.parse(data).image)
+                const output = 'data:image/jpeg;base64,' + JSON.parse(data).image
                 setProcessedFrame(output)
-
             });
+
         } catch (err) {
             console.log(err)
         }
@@ -105,7 +102,7 @@ const WebcamCapture = () => {
             
 
             {/* 2. Http response */}
-            {/* <p>VideoResponse</p> */}
+            <p>VideoResponse</p>
             <img
                 src={processedFrame}
                 alt="Video"
