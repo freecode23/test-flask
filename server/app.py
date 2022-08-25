@@ -13,7 +13,7 @@ from flask_socketio import SocketIO, send, emit
 app = Flask(__name__)
 CORS(app)
 
-# socket - get frame
+# 2. socket - get frame
 socketIo = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 @socketIo.on("frame")  
 def handleMessage(data):
@@ -40,37 +40,38 @@ def handleMessage(data):
         base64Bytes = base64.b64encode(buffer)
         json_string = json.dumps({'image': base64Bytes.decode("utf-8")})
     
+        # 5. send frame back
         emit("frame", json_string, broadcast=True)
 
         
-# http
-@app.route('/api', methods=['POST', 'GET'])
-def api():
-    # 1. get the post request's json
-	data = request.get_json()
+# 1. http
+# @app.route('/api', methods=['POST', 'GET'])
+# def api():
+#     # 1. get the post request's json
+# 	data = request.get_json()
  
-	# 2. convert to base to PILimage then OpenCV frame
-	result_str = data['data']
-	b = bytes(result_str, 'utf-8')
-	image = b[b.find(b'/9'):]
-	pilImg = Image.open(io.BytesIO(base64.b64decode(image)))
-	frame = cv2.cvtColor(np.array(pilImg), cv2.COLOR_BGR2RGB)	
+# 	# 2. convert to base to PILimage then OpenCV frame
+# 	result_str = data['data']
+# 	b = bytes(result_str, 'utf-8')
+# 	image = b[b.find(b'/9'):]
+# 	pilImg = Image.open(io.BytesIO(base64.b64decode(image)))
+# 	frame = cv2.cvtColor(np.array(pilImg), cv2.COLOR_BGR2RGB)	
  
-	# 3. write on frame
-	font = cv2.FONT_HERSHEY_SIMPLEX
-	coord = (50, 50)
-	fontScale = 1
-	color = (255, 0, 0)
-	thickness = 2
-	frame = cv2.putText(frame, 'OpenCV', coord, font,
-                     fontScale, color, thickness, cv2.LINE_AA)
+# 	# 3. write on frame
+# 	font = cv2.FONT_HERSHEY_SIMPLEX
+# 	coord = (50, 50)
+# 	fontScale = 1
+# 	color = (255, 0, 0)
+# 	thickness = 2
+# 	frame = cv2.putText(frame, 'OpenCV', coord, font,
+#                      fontScale, color, thickness, cv2.LINE_AA)
 
-    # 4. convert opencv frame to base64 string
-	retval, buffer = cv2.imencode('.jpg', frame)
-	base64String = base64.b64encode(buffer)
+#     # 4. convert opencv frame to base64 string
+# 	retval, buffer = cv2.imencode('.jpg', frame)
+# 	base64String = base64.b64encode(buffer)
  
-	# 5. send base64 back to react
-	return base64String
+# 	# 5. send base64 back to react
+# 	return base64String
 
 
 if __name__ == '__main__':
