@@ -2,6 +2,7 @@
 import React, { useState, useEffect} from 'react';
 import Webcam from 'react-webcam';
 import io from "socket.io-client";
+import "./webcam.css"
 let endPoint = "http://localhost:5000";
 let socket = io.connect(`${endPoint}`);
 
@@ -16,7 +17,25 @@ const WebcamCapture = () => {
         facingMode: 'user'
     };
 
-    // 1. HTTP send frames
+
+    // 1. websocket sendFrames
+    const sendFrames = React.useCallback(
+        () => {
+            try {
+                // - get screenshot in base64 format
+                const imageSrc = webcamRef.current.getScreenshot();
+                
+                // - send image through websocket
+                socket.emit("frame", imageSrc);
+            } catch (err) {
+                console.log(err);
+            }
+        },
+        []
+    );
+
+
+    // 2. HTTP send frames
     // const sendFrames = React.useCallback(
     //     () => {
     //         // - get screenshot in base64 format
@@ -38,22 +57,6 @@ const WebcamCapture = () => {
     //     },
     //     [webcamRef]
     // );
-
-    // 2. websocket sendFrames
-    const sendFrames = React.useCallback(
-        () => {
-            try {
-                // - get screenshot in base64 format
-                const imageSrc = webcamRef.current.getScreenshot();
-                
-                // - send image through websocket
-                socket.emit("frame", imageSrc);
-            } catch (err) {
-                console.log(err);
-            }
-        },
-        []
-    );
 
     const getFrames = () => {
         try {
@@ -84,26 +87,33 @@ const WebcamCapture = () => {
 
     
     return (
-        <div>
-
-            {/* 2. Processd Response */}
-            <p>Processed Frame</p>
-            <img
-                src={processedFrame}
-                alt="Video"
-                width="700px"
-            />
+        <div className='frames'>
 
             {/* 1. Webcam */}
-            <Webcam
-                // audio={false}
-                muted={false}
-                ref={webcamRef}
-                screenshotFormat="image/jpeg"
-                videoConstraints={videoConstraints}
-                style={{ opacity: 0 }}
-            />
-            <button onClick={sendFrames}>Click Me!</button>
+            <div className='webcam'>
+                <h1>Webcam</h1>
+                <Webcam
+                    // audio={false}
+                    muted={false}
+                    ref={webcamRef}
+                    screenshotFormat="image/jpeg"
+                    videoConstraints={videoConstraints}
+                // style={{ opacity: 0 }}
+                />
+            </div>
+
+
+
+            {/* 2. Processd Response */}
+            <div className='processed'>
+                <h1>Processed Frame</h1>
+                <img
+                    src={processedFrame}
+                    alt="Video"
+                    width="700px"
+                />
+            </div>
+            {/* <button onClick={sendFrames}>Click Me!</button> */}
 
         </div>
     );

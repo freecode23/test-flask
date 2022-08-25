@@ -1,0 +1,8 @@
+.frames {
+    display: flex;
+    flex-direction: row;
+}
+
+.processed {
+    margin-left: 100px
+}
