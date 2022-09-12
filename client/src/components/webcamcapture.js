@@ -3,6 +3,7 @@ import Webcam from "react-webcam";
 import io from "socket.io-client";
 import "./webcam.css";
 let endPoint = "http://localhost:5000";
+// let endPoint = "http://18.216.86.90:5000";
 let socket = io.connect(`${endPoint}`);
 
 const WebcamCapture = () => {
@@ -28,28 +29,7 @@ const WebcamCapture = () => {
     }
   }, []);
 
-  // 2. HTTP send frames
-  // const sendFrames = React.useCallback(
-  //     () => {
-  //         // - get screenshot in base64 format
-  //         const imageSrc = webcamRef.current.getScreenshot();
-  //         // console.log(`imageSrc = ${imageSrc}`)
 
-  //         // - send post request to process a single image shot
-  //         axios.post('http://0.0.0.0:5000/api', { data: imageSrc })
-  //             .then(res => {
-  //                 console.log(`response = ${res.data}`)
-  //                 setDataName(res.data)
-
-  //                 const output = 'data:image/jpeg;base64,' + res.data
-  //                 setProcessedFrame(output)
-  //             })
-  //             .catch(error => {
-  //                 console.log(`error = ${error}`)
-  //             })
-  //     },
-  //     [webcamRef]
-  // );
 
   const getFrames = () => {
     try {
@@ -68,6 +48,7 @@ const WebcamCapture = () => {
     const interval = setInterval(() => {
       // send frames every 50ms
       sendFrames();
+
       // getFrames();
     }, 50);
 
@@ -100,7 +81,6 @@ const WebcamCapture = () => {
         <h1>Processed Frame</h1>
         <img src={processedFrame} alt="Video" width="700px" />
       </div>
-      {/* <button onClick={sendFrames}>Click Me!</button> */}
     </div>
   );
 };
