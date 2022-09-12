@@ -68,6 +68,7 @@ const WebcamCapture = () => {
     const interval = setInterval(() => {
       // send frames every 50ms
       sendFrames();
+      // getFrames();
     }, 50);
 
     //Setup listener to get frames

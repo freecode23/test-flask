@@ -6,12 +6,18 @@ import base64
 import io
 import cv2
 import numpy as np
+import simplejpeg
 
 #socket import
 from flask_socketio import SocketIO, send, emit
 
 app = Flask(__name__)
 CORS(app)
+font = cv2.FONT_HERSHEY_SIMPLEX
+coord = (50, 50)
+fontScale = 1
+color = (255, 0, 0)
+thickness = 2
 
 # 1. socket - get frame
 socketIo = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
@@ -21,26 +27,35 @@ def handleMessage(data):
     if(not result_str):
         print("no result")
     else:
-        # 2. convert to base to PILimage then OpenCV frame
+        # 2. convert base64 to OpenCV frame
         b = bytes(result_str, 'utf-8')
         image = b[b.find(b'/9'):]
-        pilImg = Image.open(io.BytesIO(base64.b64decode(image)))
-        frame = cv2.cvtColor(np.array(pilImg), cv2.COLOR_BGR2RGB)
-    
+        
+        # opt1: use pilImg
+        # pilImg = Image.open(io.BytesIO(base64.b64decode(image)))
+        # frame = cv2.cvtColor(np.array(pilImg), cv2.COLOR_BGR2RGB)
+        
+        # opt2: convert directly
+        im_bytes = base64.b64decode(image)
+        im_arr = np.frombuffer(im_bytes, dtype=np.uint8)
+        frame = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
+
 		# 3. write on frame
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        coord = (50, 50)
-        fontScale = 1
-        color = (255, 0, 0)
-        thickness = 2
         frame = cv2.putText(frame, 'OpenCV', coord, font,
 							fontScale, color, thickness, cv2.LINE_AA)
-        # 4. convert opencv frame to json string
-        retval, buffer = cv2.imencode('.jpg', frame)
+        
+        # 4. convert opencv frame to jpeg 
+        # opt1: use imencode
+        # retval, buffer = cv2.imencode('.jpg', frame)
+        
+        # opt2: use simplejpeg
+        buffer = simplejpeg.encode_jpeg(frame, colorspace='BGR')
+        
+        # 5. convert jpeg to base64
         base64Bytes = base64.b64encode(buffer)
         json_string = json.dumps({'image': base64Bytes.decode("utf-8")})
     
-        # 5. send frame back
+        # 6. send frame back
         emit("frame", json_string, broadcast=True)
 
         
