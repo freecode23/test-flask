@@ -19,6 +19,7 @@ Pillow==9.2.0
 python-engineio==4.3.4
 python-socketio==5.7.1
 simple-websocket==0.8.1
+simplejpeg==1.6.5
 six==1.16.0
 Werkzeug==2.2.2
 wsproto==1.2.0
