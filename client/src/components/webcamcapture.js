@@ -18,38 +18,37 @@ const WebcamCapture = () => {
   };
 
   // A. websocket sendFrames >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-  //
-  // const sendFrames = React.useCallback(() => {
-  //   try {
-  //     // - get screenshot in base64 format
-  //     const imageSrc = webcamRef.current.getScreenshot();
+  const sendFrames = React.useCallback(() => {
+    try {
+      // - get screenshot in base64 format
+      const imageSrc = webcamRef.current.getScreenshot();
 
-  //     // - send image through websocket
-  //     socket.emit("frame", imageSrc);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }, []);
+      // - send image through websocket
+      socket.emit("frame", imageSrc);
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
 
   // B. HTTP send frames >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-  const sendFrames = React.useCallback(
-      () => {
-          // - get screenshot in base64 format
-          const imageSrc = webcamRef.current.getScreenshot();
+  // const sendFrames = React.useCallback(
+  //     () => {
+  //         // - get screenshot in base64 format
+  //         const imageSrc = webcamRef.current.getScreenshot();
 
-          // - send post request to process a single image shot
-          axios.post('http://0.0.0.0:5000/api', { data: imageSrc })
-              .then(res => {
+  //         // - send post request to process a single image shot
+  //         axios.post('http://0.0.0.0:5000/api', { data: imageSrc })
+  //             .then(res => {
 
-                  const output = 'data:image/jpeg;base64,' + res.data
-                  setProcessedFrame(output)
-              })
-              .catch(error => {
-                  console.log(`error = ${error}`)
-              })
-      },
-      [webcamRef]
-  );
+  //                 const output = 'data:image/jpeg;base64,' + res.data
+  //                 setProcessedFrame(output)
+  //             })
+  //             .catch(error => {
+  //                 console.log(`error = ${error}`)
+  //             })
+  //     },
+  //     [webcamRef]
+  // );
 
 
   const getFrames = () => {
