@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Webcam from "react-webcam";
 import io from "socket.io-client";
-import axios from "axios"
+// import axios from "axios"
 import "./webcam.css";
-let endPoint = "http://localhost:5000";
+let endPoint = "ws://localhost:5500";
+// let endPoint = "http://localhost:5500";
 // let endPoint = "http://18.216.86.90:5000";
 let socket = io.connect(`${endPoint}`);
 
 const WebcamCapture = () => {
   const webcamRef = React.useRef(null);
-  const [processedFrame, setProcessedFrame] = useState(null);
+  const [processedFrame, setProcessedFrame] = React.useState(null);
 
   const videoConstraints = {
     width: 416,
@@ -53,7 +54,7 @@ const WebcamCapture = () => {
 
   const getFrames = () => {
     try {
-      socket.on("frame", (data) => {
+      socket.on("processed-frame", (data) => {
         // console.log("content>>", JSON.parse(data).image)
         const output = "data:image/jpeg;base64," + JSON.parse(data).image;
         setProcessedFrame(output);
@@ -79,7 +80,7 @@ const WebcamCapture = () => {
       console.log(`clearing interval`);
       clearInterval(interval);
     };
-  }, []);
+  }, [sendFrames]);
 
   return (
     <div className="frames">

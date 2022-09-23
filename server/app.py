@@ -8,9 +8,16 @@ import cv2
 import numpy as np
 import simplejpeg
 
+
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 #socket import
 from flask_socketio import SocketIO, send, emit
+
 app = Flask(__name__)
+
 CORS(app)
 font = cv2.FONT_HERSHEY_SIMPLEX
 coord = (50, 50)
@@ -26,6 +33,8 @@ def handleMessage(data):
     if(not result_str):
         print("no result")
     else:
+        # logger.info('handling socketIO frame')
+        # logger.info('handling socketIO frame [result_str: %s]', result_str)
         # 2. convert base64 to OpenCV frame
         b = bytes(result_str, 'utf-8')
         image = b[b.find(b'/9'):]
@@ -55,7 +64,7 @@ def handleMessage(data):
         json_string = json.dumps({'image': base64Bytes.decode("utf-8")})
     
         # 6. send frame back
-        emit("frame", json_string, broadcast=True)
+        emit("processed-frame", json_string, broadcast=True)
 
         
 # B. HTTP
@@ -89,8 +98,5 @@ def handleMessage(data):
 
 
 if __name__ == '__main__':
-	app.run(host='0.0.0.0')
+	app.run(host='0.0.0.0', port=5500)
 	socketIo.run(app, debug=True)
-
-
-
