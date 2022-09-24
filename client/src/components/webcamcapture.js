@@ -42,9 +42,7 @@ const WebcamCapture = ({socket}) => {
   }, [socket]);
 
   useEffect(() => {
-
     console.log("now listening for events from backend..")
-
     try{
       socket.on("init", (data) => {
         // console.log("server>>", data)
