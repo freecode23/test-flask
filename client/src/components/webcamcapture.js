@@ -1,24 +1,22 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Webcam from "react-webcam";
-import io from "socket.io-client";
-import axios from "axios"
 import "./webcam.css";
-let endPoint = "http://localhost:5000";
-// let endPoint = "http://18.216.86.90:5000";
-let socket = io.connect(`${endPoint}`);
 
-const WebcamCapture = () => {
-  const webcamRef = React.useRef(null);
+let serverAck = false;
+
+const videoConstraints = {
+  width: 416,
+  height: 416,
+  facingMode: "user",
+};
+
+const WebcamCapture = ({socket}) => {
+  const webcamRef = useRef(null);
   const [processedFrame, setProcessedFrame] = useState(null);
 
-  const videoConstraints = {
-    width: 416,
-    height: 416,
-    facingMode: "user",
-  };
 
   // A. websocket sendFrames >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-  const sendFrames = React.useCallback(() => {
+  const sendFrames = useCallback(() => {
     try {
       // - get screenshot in base64 format
       const imageSrc = webcamRef.current.getScreenshot();
@@ -28,30 +26,9 @@ const WebcamCapture = () => {
     } catch (err) {
       console.log(err);
     }
-  }, []);
+  }, [socket]);
 
-  // B. HTTP send frames >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-  // const sendFrames = React.useCallback(
-  //     () => {
-  //         // - get screenshot in base64 format
-  //         const imageSrc = webcamRef.current.getScreenshot();
-
-  //         // - send post request to process a single image shot
-  //         axios.post('http://0.0.0.0:5000/api', { data: imageSrc })
-  //             .then(res => {
-
-  //                 const output = 'data:image/jpeg;base64,' + res.data
-  //                 setProcessedFrame(output)
-  //             })
-  //             .catch(error => {
-  //                 console.log(`error = ${error}`)
-  //             })
-  //     },
-  //     [webcamRef]
-  // );
-
-
-  const getFrames = () => {
+  const getFrames = useCallback(() => {
     try {
       socket.on("frame", (data) => {
         // console.log("content>>", JSON.parse(data).image)
@@ -59,27 +36,43 @@ const WebcamCapture = () => {
         setProcessedFrame(output);
       });
     } catch (err) {
-      console.log(err);
+      // console.log(err);
+      console.log("no event received yet from backend..");
     }
-  };
+  }, [socket]);
 
-  React.useEffect(() => {
-    console.log(`initializing interval`);
-    const interval = setInterval(() => {
-      // send frames every 50ms
-      sendFrames();
+  useEffect(() => {
 
-      // getFrames();
-    }, 50);
+    console.log("now listening for events from backend..")
 
-    //Setup listener to get frames
-    getFrames();
+    try{
+      socket.on("init", (data) => {
+        // console.log("server>>", data)
+        console.log("intitiating events from frontend..")
+        // console.log("server>>", JSON.parse(data))
+      });
+      serverAck = true;
+    } catch (err) {
+      console.log("no connection ack from backend yet..");
+    }
 
-    return () => {
-      console.log(`clearing interval`);
-      clearInterval(interval);
-    };
-  }, []);
+    if (serverAck) {
+      //Setup listener to get frames
+      getFrames();
+      console.log(`initializing sendFrames() interval`);
+      const interval = setInterval(() => {
+        // send frames every 50ms
+        sendFrames();
+
+        // getFrames();
+      }, 50);
+      return () => {
+        console.log(`clearing sendFrames() interval`);
+        clearInterval(interval);
+      };
+    }
+
+  }, [socket, getFrames, sendFrames]);
 
   return (
     <div className="frames">
