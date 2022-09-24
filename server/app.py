@@ -26,6 +26,7 @@ fontScale = 1
 color = (255, 0, 0)
 thickness = 2
 
+# socketIo = SocketIO(app, cors_allowed_origins="*")
 socketIo = SocketIO(app, cors_allowed_origins="*", async_mode="gevent")
 
 @socketIo.on('connect')
@@ -117,5 +118,5 @@ if __name__ == '__main__':
         app,
         host='0.0.0.0',
         port=5500,
-        debug=False
+        debug=True
     )

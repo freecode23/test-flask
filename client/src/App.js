@@ -1,9 +1,15 @@
 import React from 'react';
 import WebcamCapture from './components/webcamcapture.js';
+// import WebcamStreamCapture from './components/webcamstream.js';
 import io from "socket.io-client";
 import './App.css';
 
-let endPoint = "localhost:5500";
+// let endPoint = "13.233.110.144";
+// let endPoint = "wss://13.233.110.144";
+let endPoint = "wss://toptal.projectsiege.org";
+// let endPoint = "ws://127.0.0.1";
+// let endPoint = "13.233.110.144:5500";
+// let endPoint = "127.0.0.1:5500";
 
 const App = () => {
 
@@ -12,10 +18,11 @@ const App = () => {
   React.useEffect(() => {
     let socketInitiated = false;
 
-    const socket = io(endPoint, {
+    const socket = io.connect(endPoint, {
       transports: ["websocket"],
       cors: {
-        origin: "http://localhost:3000/",
+	      origin: "*",
+        // origin: "http://13.233.110.144:3000/",
       },
     });
 
@@ -45,7 +52,7 @@ const App = () => {
   return (
     <>
       <div>
-        <WebcamCapture socket={socketInstance} />
+          <WebcamCapture socket={socketInstance} />
       </div>
     </>
   )
