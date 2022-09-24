@@ -14,9 +14,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 #socket import
-from flask_socketio import SocketIO, send, emit
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'lkjsefl873lkjhfEbhsUd4xJ7waa6Brg='
 
 CORS(app)
 font = cv2.FONT_HERSHEY_SIMPLEX
@@ -25,13 +26,20 @@ fontScale = 1
 color = (255, 0, 0)
 thickness = 2
 
+socketIo = SocketIO(app, cors_allowed_origins="*", async_mode="gevent")
+
+@socketIo.on('connect')
+def test_connect(auth):
+    logger.info('received connect request from client')
+    emit('init', {'backend': 'ack'})
+
+
 # A. Socket - get frame
-socketIo = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 @socketIo.on("frame")  
 def handleMessage(data):
     result_str = data
     if(not result_str):
-        print("no result")
+        print("no frames received")
     else:
         # logger.info('handling socketIO frame')
         # logger.info('handling socketIO frame [result_str: %s]', result_str)
@@ -64,9 +72,15 @@ def handleMessage(data):
         json_string = json.dumps({'image': base64Bytes.decode("utf-8")})
     
         # 6. send frame back
-        emit("processed-frame", json_string, broadcast=True)
+        emit("frame", json_string, broadcast=True)
 
-        
+
+
+@socketIo.on('disconnect')
+def test_disconnect():
+    logger.info('received disconnect request from client')
+
+
 # B. HTTP
 # @app.route('/api', methods=['POST', 'GET'])
 # def api():
@@ -98,5 +112,10 @@ def handleMessage(data):
 
 
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=5500)
-	socketIo.run(app, debug=True)
+	# app.run(host='0.0.0.0', port=5500)
+	socketIo.run(
+        app,
+        host='0.0.0.0',
+        port=5500,
+        debug=False
+    )
