@@ -4,12 +4,11 @@ import WebcamCapture from './components/webcamcapture.js';
 import io from "socket.io-client";
 import './App.css';
 
-// let endPoint = "13.233.110.144";
 // let endPoint = "wss://13.233.110.144";
-let endPoint = "wss://toptal.projectsiege.org";
-// let endPoint = "ws://127.0.0.1";
+// let endPoint = "13.233.110.144";
 // let endPoint = "13.233.110.144:5500";
-// let endPoint = "127.0.0.1:5500";
+// let endPoint = "ws://127.0.0.1";
+let endPoint = "wss://toptal.poc.com";
 
 const App = () => {
 
@@ -42,6 +41,7 @@ const App = () => {
     return function cleanup() {
       if (socketInitiated) {
         // socket.disconnect();
+        // socket.readyState === 1
         socket.close();
         console.log("socket instance closed..");
       }
