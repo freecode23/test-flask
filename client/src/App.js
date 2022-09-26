@@ -8,6 +8,8 @@ import './App.css';
 // let endPoint = "13.233.110.144";
 // let endPoint = "13.233.110.144:5500";
 // let endPoint = "ws://127.0.0.1";
+
+// Question: how to make it handle many request from different browser client?
 let endPoint = "wss://toptal.poc.com";
 
 const App = () => {

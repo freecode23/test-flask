@@ -62,7 +62,6 @@ const WebcamCapture = ({socket}) => {
         // send frames every 50ms
         sendFrames();
 
-        // getFrames();
       }, 50);
       return () => {
         console.log(`clearing sendFrames() interval`);

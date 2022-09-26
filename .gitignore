@@ -17,8 +17,8 @@ videos/
 *.cfg
 .DS_Store  
 .ipynb_checkpoints
-
-
+.venv
+*/project_env
 .pem
 objectDetectSSH.pem
 *.mp4
